@@ -4,13 +4,15 @@ var fs = require("fs");
 
 var keys = require("./keys.js"); // require the keys.js file
 // var spotify = new spotify(keys.spotify); // reads the spotify ids from the keys.js file
-var client = new Twitter(keys.twitter); // reads the twitter ids and tokens from the keys.js file
 var spotify = require("node-spotify-api"); // requires the npm package for spotify
 var twitter = require("twitter"); // requires the npm package for twitter
+var client = new twitter(keys.twitter); // reads the twitter ids and tokens from the keys.js file
+var spotify = new spotify(keys.spotify);
 
 var userCommand = process.argv[2]; // assign the variable command to the user entry
 var nameOfSong = process.argv[3]; // name of the song that follows the 'spotify-this-song command'
-var nameOfMovie = process.argv[3];
+var nameOfMovie = process.argv[3]; // name of the movie that follows the movie-this command
+
 // create a function that will read the user entry and see if it's one of the following: `my-tweets`,`spotify-this-song`,`movie-this`, or`do-what-it-says`
 var readCommand = function(){
   switch (userCommand) {
@@ -58,10 +60,10 @@ var getTweets = function(){
 } // end of getTweets function
 
 // if the user command is 'spotify-this-song + song name', create a function that will show the following information:
-    // the artist(s),
     // song name,
-    // preview link of the song from spotify and
+    // the artist(s),
     // the album that song is from.
+    // preview link of the song from spotify and
 
 // create a function to switch the first letter of the word in the string to uppercase
 function upperCase (nameOfSong){
@@ -109,7 +111,7 @@ var getSpotify = function(){
     else if (songsMatched.length === 0) {
       console.log("There are no songs that match your search.");
     }
-    
+
     // create another loop to go through the tracks and get the info for each one
     for (var j =0; j < songsMatched.length; j++) {
       console.log("");
@@ -139,7 +141,15 @@ var getSpotify = function(){
     // * Actors in the movie.
 var getMovie = function(){
 
+  var movie;
   // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
+  if (nameOfMovie != null){
+    movie = nameOfMovie; // assign the user input to the movie var
+  } else {
+    movie = "Mr. Nobody";
+  }
+
+
 
 } // end of getMovie function.
 
