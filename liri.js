@@ -9,11 +9,12 @@ var spotify = require("node-spotify-api"); // requires the npm package for spoti
 var twitter = require("twitter"); // requires the npm package for twitter
 
 var userCommand = process.argv[2]; // assign the variable command to the user entry
-
+var nameOfSong = process.argv[3]; // name of the song that follows the 'spotify-this-song command'
+var nameOfMove = process.argv[3];
 // create a function that will read the user entry and see if it's one of the following: `my-tweets`,`spotify-this-song`,`movie-this`, or`do-what-it-says`
 var readingCommand = function(){
   switch (userCommand) {
-    case 'my-tweet': // if the user's command is 'my-tweet' then
+    case 'my-tweets': // if the user's command is 'my-tweet' then
         getTweets(); // call the getTweets function
       break;
     case 'spotify-this-song': // if the commasnd is this then
@@ -25,23 +26,47 @@ var readingCommand = function(){
     case 'do-what-it-says': // if the user command is this
         getRandom(); // call the get random function to take the text inside of random.txt and then use it to call one of LIRI's commands.
       break;
+    default:
 
-  }
+      break;
 
-}
+      console.log(userCommand);
+  } // end of switch/case
+
+} // end of the readingCommand function
+
+// if the user command is 'my-tweets', create a function that will retrieve your latest 20 tweets and when they were created.
+var getTweets = function (){
+
+} // end of getTweets function
+
+// if the user command is 'spotify-this-song + song name', create a function that will show the following information:
+    // the artist(s),
+    // song name,
+    // preview link of the song from spotify and
+    // the album that song is from.
+var getSpotify = function(){
+
+} // end of getSpotify function
+
+// if the user command is 'movie-this', create a function that will output the following information:
+    // * Title of the movie.
+    // * Year the movie came out.
+    // * IMDB Rating of the movie.
+    // * Rotten Tomatoes Rating of the movie.
+    // * Country where the movie was produced.
+    // * Language of the movie.
+    // * Plot of the movie.
+    // * Actors in the movie.
+var getMovie = function (){
+
+  // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
+
+} // end of getMovie function.
+
+// if the user command is 'do-what-it-says', then the  LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
+    // It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
+var getRandom = function(){
 
 
-// var params = {adrianfsdev: 'nodejs'};
-// client.get('statuses/user_timeline', params, function(error, tweets, response) {
-//   if (!error) {
-//     console.log(tweets);
-//   }
-// });
-//
-// spotify.search({ type: 'track', query: 'All the Small Things' }, function(err, data) {
-//   if (err) {
-//     return console.log('Error occurred: ' + err);
-//   }
-//
-// console.log(data);
-// });
+} // end of getRandom function
