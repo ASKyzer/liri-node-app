@@ -1,8 +1,8 @@
 console.log('this is loaded');
 
 exports.twitter = {
-  consumer_key: process.env.QuJjyacTuN5Nau7e7XaTAIZ17,
-  consumer_secret: process.env.VcDNtOpfkdwxHEMIYk60lt6IkK4A4l2bxZlN2DpyJEAcZR3xdc,
+  consumer_key: process.env.8KkaDBQbwqVhkg7ZKfIhIsMsk,
+  consumer_secret: process.env.DFSvQB8Auz9eJXrmcINvBdcB99qnzhA4xxZ6P0A9HU2jVGu1NA,
   access_token_key: process.env.968247402573463552-kSxSCPuWB7NdVGOQ13zoFvh4VU3eJ6o,
   access_token_secret: process.env.kVfvVNXb5ovrCqQyOMwzceiGVRCyf21jFkPKPZMj2Sdau
 };
