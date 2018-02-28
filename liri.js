@@ -49,8 +49,9 @@ var getTweets = function(){
         // loop through the last twenty tweets and output when the tweet was created and what the tweet says.
         for (var i = 0; i<numOfTweets; i++){
           // log the tweet and when it was created
-          console.log("You said: " + tweets[i].text + " on " + tweets[i].created_at);
-
+          console.log((i+1) + ". You said: " + tweets[i].text + " on " + tweets[i].created_at);
+          console.log(""); // adds a blank line between tweets to make it more legible
+        } // end of for loop
       } // end of if statement
     }); // end of twitter params
 
@@ -61,8 +62,70 @@ var getTweets = function(){
     // song name,
     // preview link of the song from spotify and
     // the album that song is from.
+
+// create a function to switch the first letter of the word in the string to uppercase
+function upperCase (nameOfSong){
+  return nameOfSong.toUpperCase();
+}
+// grab the first letter of each word of the string
+function titleCase(nameOfSong){
+	var firstLetter = /(^|\s)[a-z]/g;
+	return nameOfSong.replace(firstLetter, upperCase);
+}
+
 var getSpotify = function(){
 
+  var track;
+
+  if (nameOfSong != null){
+    track = titleCase(nameOfSong);
+  } else {
+    track = "Yesterday"
+  }
+
+    // per spoitfy's npm documentation to search their catalog via track name
+    spotify.search({ type: 'track', query: track }, function(err, data) {
+    if (err) {
+      return console.log('Error occurred: ' + err);
+    } // end of if statement
+
+    // assign the returned data items to the variable results
+    var results = data.tracks.items;
+    //  assign matched song into an array so we can push songs that match the title into it
+    var songsMatched = [];
+    // loop through the results to see how many songs match your track
+    for (var i = 0; i < 20; i++){
+      if (results[i].name == track){
+        songsMatched.push(i);
+      }
+
+    } // end of loop to search for songs that match your tracks
+
+    // tell the user how many songs match their search
+    if (songsMatched.length > 0){
+      console.log("There are " + songsMatched.length + " songs that matched your search");
+    }
+    // if no matches, then tell the user
+    else if (songsMatched.length === 0) {
+      console.log("There are no songs that match your search.");
+    }
+    
+    // create another loop to go through the tracks and get the info for each one
+    for (var j =0; j < songsMatched.length; j++) {
+      console.log("");
+      console.log("Artist: " + results[songsMatched[j]].artists[0].name); // names of artist(s)
+      console.log("Title: " + results[songsMatched[j]].name); // name of the song
+      console.log("Album name: " + results[[songsMatched[j]]].album.name); // album names
+      // check to see if the preview value is empty
+      if (results[songsMatched[j]].preview_url != null) {
+        // if not, then log preview_url
+        console.log("Preview it here: " + results[songsMatched[j]].preview_url);
+      }  else{
+        // if empty, then log the following
+        console.log("There are no previews for this track.");
+      }
+    } // end of for loop to write info for the songsMatched
+  }); // end of search in spotify
 } // end of getSpotify function
 
 // if the user command is 'movie-this', create a function that will output the following information:

@@ -7,7 +7,7 @@ exports.twitter = {
   access_token_secret: process.env.kVfvVNXb5ovrCqQyOMwzceiGVRCyf21jFkPKPZMj2Sdau
 };
 
-exports.spotify = {
+exports.Spotify = {
   id: process.env.04dc4c7600634778927a641f82281e1c,
   secret: process.env.d6ff9fadd73641f0b37260024c93e0c6
 };
