@@ -20,6 +20,7 @@ var search = "";
   // Build a string with the song entry.
     search = (search + " " + nodeArgs[i]);
   } // end of for loop to loop through process.argv
+
   // the above loop returns a white space before the string so we need to get rid of that.
   // search = search.trim();
   search = search.trim();
@@ -48,12 +49,10 @@ var getTweets = function(){
 
   // assign the numberOfTweets variable to the number to tweets we want to display which is 20
   var numOfTweets = 20;
-
   // per twitter's npm documentation to get the user's latest tweets
   var params = {screen_name: 'adrianfsdev'};
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
       if (!error) {
-
         // loop through the last twenty tweets and output when the tweet was created and what the tweet says.
         for (var i = 0; i<numOfTweets; i++){
           // log the tweet and when it was created
@@ -62,7 +61,6 @@ var getTweets = function(){
         } // end of for loop
       } // end of if statement
     }); // end of twitter params
-
 } // end of getTweets function
 
 // since Spotify's API has the first letter of every word in their song name,
@@ -82,13 +80,13 @@ function titleCase(search){
     // the album that song is from.
     // preview link of the song from spotify
 var getSpotify = function(){
-// console.log(search);
 
-  track = titleCase(search).trim();
+  search = search.trim(); // makes sure that the search has no extra white space when passed from the getRandom function
+  track = titleCase(search);
   // If the user entry is empty, then the default song is "Choose a Song".
-  // if (process.argv[3] == null ){
-  //   track = "Choose a Song";
-  // }
+  if (search == "" ){
+    track = "Choose a Song";
+  }
     // per spoitfy's npm documentation to search their catalog via track name
     spotify.search({ type: 'track', query: track }, function(err, data) {
     if (err) {
@@ -99,20 +97,13 @@ var getSpotify = function(){
     var results = data.tracks.items;
     //  assign matched song into an array so we can push songs that match the title into it
     var songsMatched = [];
-    console.log(results[0].name);
     // loop through the 20 results to see how many songs exactly match your track.
     for (var i = 0; i < 20; i++){
-      console.log(results[i]);
-      // console.log(results[i].name);
-      // debugger;
-      // console.log(track);
       if (results[i].name == track){
         songsMatched.push(i);
-
       }
     } // end of loop to search for songs that match your tracks
-    console.log(songsMatched);
-    console.log(songsMatched.length);
+
     // tell the user how many songs match their search
     if (songsMatched.length > 0){
       console.log("");
