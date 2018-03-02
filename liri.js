@@ -1,6 +1,7 @@
 require("dotenv").config(); // require the .env file
 
 var fs = require("fs"); // built in file system to read and write files
+var request = require("request"); // request needed for OMDB query
 
 var keys = require("./keys.js"); // require the keys.js file
 // var spotify = new spotify(keys.spotify); // reads the spotify ids from the keys.js file
@@ -12,20 +13,20 @@ var spotify = new spotify(keys.spotify);
 var userCommand = process.argv[2]; // assign the variable command to the user entry
 var nodeArgs = process.argv; // the array of user entry including the userCommand
 // create an empty string for holding the name of the song and name of movie
-var nameOfSong = "";
-var nameOfMovie = "";
+var search = "";
+
   // Capture all the words in the address (again ignoring the first two Node arguments)
   for (var i = 3; i < nodeArgs.length; i++) {
   // Build a string with the song entry.
-    nameOfSong = (nameOfSong + " " + nodeArgs[i]);
-    nameOfMovie = (nameOfMovie + "+" + nodeArgs[i]);
-  }// end of for loop to loop through process.argv
+    search = (search + " " + nodeArgs[i]);
+  } // end of for loop to loop through process.argv
   // the above loop returns a white space before the string so we need to get rid of that.
-  nameOfSong = nameOfSong.trim();
-  nameOfMovie = nameOfMovie.trim();
-console.log(nameOfMovie);
+  // search = search.trim();
+  search = search.trim();
+
 // create a function that will read the user entry and see if it's one of the following: `my-tweets`,`spotify-this-song`,`movie-this`, or`do-what-it-says`
-var readCommand = function(){
+var readCommand = function(userCommand, search){
+
   switch (userCommand) {
     case 'my-tweets': // if the user's command is 'my-tweet' then
         getTweets(); // call the getTweets function
@@ -34,14 +35,11 @@ var readCommand = function(){
         getSpotify(); // call the getSpotify function
       break;
     case 'movie-this': // if the user command is this
-        getMovie(); // call the getMovie function
+        getMovie(search); // call the getMovie function
       break;
     case 'do-what-it-says': // if the user command is this
         getRandom(); // call the get random function to take the text inside of random.txt and then use it to call one of LIRI's commands.
       break;
-    // default:
-    //
-    //   break;
   } // end of switch/case
 } // end of the readCommand function
 
@@ -68,16 +66,15 @@ var getTweets = function(){
 } // end of getTweets function
 
 // since Spotify's API has the first letter of every word in their song name,
-// create a function to switch the first letter of the word in the string to uppercase
-function upperCase(nameOfSong){
-  return nameOfSong.toUpperCase();
-}
-// grab the first letter of each word of the string
-function titleCase(nameOfSong){
+// create a function to switch the first letter of the word in the string to uppercase for matching the song later
+function upperCase(search){
+  return search.toUpperCase();
+} // end of upperCase function
+// grab the first letter of each word of the string and use upperCase function to replace with a capital letter
+function titleCase(search){
 	var firstLetter = /(^|\s)[a-z]/g;
-	return nameOfSong.replace(firstLetter, upperCase);
-}
-console.log(nameOfSong); // check to see if the words in the song has capitalized first letters
+	return search.replace(firstLetter, upperCase);
+} //end of titleCase function
 
 // if the user command is 'spotify-this-song + song name', create a function that will show the following information:
     // song name,
@@ -85,15 +82,13 @@ console.log(nameOfSong); // check to see if the words in the song has capitalize
     // the album that song is from.
     // preview link of the song from spotify
 var getSpotify = function(){
+// console.log(search);
 
-  var track;
+  track = titleCase(search).trim();
   // If the user entry is empty, then the default song is "Choose a Song".
-  if (process.argv[3] != null){
-    track = titleCase(nameOfSong);
-  } else {
-    track = "Choose a Song";
-  }
-
+  // if (process.argv[3] == null ){
+  //   track = "Choose a Song";
+  // }
     // per spoitfy's npm documentation to search their catalog via track name
     spotify.search({ type: 'track', query: track }, function(err, data) {
     if (err) {
@@ -104,16 +99,23 @@ var getSpotify = function(){
     var results = data.tracks.items;
     //  assign matched song into an array so we can push songs that match the title into it
     var songsMatched = [];
-    // loop through the results to see how many songs match your track
+    console.log(results[0].name);
+    // loop through the 20 results to see how many songs exactly match your track.
     for (var i = 0; i < 20; i++){
+      console.log(results[i]);
+      // console.log(results[i].name);
+      // debugger;
+      // console.log(track);
       if (results[i].name == track){
         songsMatched.push(i);
+
       }
-
     } // end of loop to search for songs that match your tracks
-
+    console.log(songsMatched);
+    console.log(songsMatched.length);
     // tell the user how many songs match their search
     if (songsMatched.length > 0){
+      console.log("");
       console.log("There are " + songsMatched.length + " songs that matched your search");
     }
     // if no matches, then tell the user
@@ -134,10 +136,10 @@ var getSpotify = function(){
         // if empty, then log the following
         console.log("There are no previews for this track.");
       }
+      console.log("");
     } // end of for loop to write info for the songsMatched
   }); // end of search in spotify
 } // end of getSpotify function
-
 
 // if the user command is 'movie-this', create a function that will output the following information:
     // * Title of the movie.
@@ -148,32 +150,64 @@ var getSpotify = function(){
     // * Language of the movie.
     // * Plot of the movie.
     // * Actors in the movie.
-var getMovie = function(){
+var getMovie = function(search){
 
-  var movie;
   // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-  if (process.argv[3] != null || process.argv[3] == ""){
-    movie = nameOfMovie; // assign the user input to the movie var
-  } else {
-    movie = "Mr. Nobody";
+  if (!process.argv[3]){
+    search = "Mr. Nobody";
   }
+  // run a request to the OMDB API with the movie specified
+  var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=trilogy";
 
-  console.log(movie);
+  console.log(queryUrl); // to debug the url
 
+  // tequest the movie info based on the queryURL
+  request(queryUrl, function(error, response, body) {
+
+    // if the request is successful
+    if (!error && response.statusCode === 200) {
+
+      // Parse the body of the site and recover the information layed out before the getMovie function starts
+      console.log("");
+      console.log("Title: " + JSON.parse(body).Title);
+      console.log("Release Year: " + JSON.parse(body).Year);
+      console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+      console.log('Rotten Tomatoes Rating: '+JSON.parse(body).Ratings[1].Value);
+      console.log("Country: " + JSON.parse(body).Country);
+      console.log("Language: " + JSON.parse(body).Language);
+      console.log("Plot: " + JSON.parse(body).Plot);
+      console.log("Actors: " + JSON.parse(body).Actors);
+      console.log("Director: " + JSON.parse(body).Director);
+      console.log("");
+    } // end of if statement
+  }); // end of OMDB request function
 } // end of getMovie function.
 
 // if the user command is 'do-what-it-says', then the  LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
     // It should run spotify-this-song for "I Want it That Way," as follows the text in random.txt.
 var getRandom = function(){
 
+  // read the random.text file
+  fs.readFile("random.txt", "utf8", function(err, data) {
+    if (err) {
+      return console.log(err);
+    } // end of if statement
+    // split the data into an array
+    var dataArray = data.split(",");
 
+    userCommand = dataArray[0];
+    search = dataArray[1];
+
+    readCommand(userCommand, search);
+
+  }); // end of readFile function
 } // end of getRandom function
 
 ///////////////////////////
 // INITIATE THE PROGRAM //
 /////////////////////////
 
-readCommand();
+readCommand(userCommand, search);
 
 
 ////////////////////////////////////
