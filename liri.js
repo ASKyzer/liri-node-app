@@ -1,5 +1,6 @@
-require("dotenv").config(); // require the .env file
+require('dotenv').config() // require the .env file
 
+var inquirer = require("inquirer"); // require the npm package inquirer
 var fs = require("fs"); // built in file system to read and write files
 var request = require("request"); // request needed for OMDB query
 
@@ -10,36 +11,53 @@ var twitter = require("twitter"); // requires the npm package for twitter
 var client = new twitter(keys.twitter); // reads the twitter ids and tokens from the keys.js file
 var spotify = new spotify(keys.spotify);
 
-var userCommand = process.argv[2]; // assign the variable command to the user entry
-var nodeArgs = process.argv; // the array of user entry including the userCommand
+var userCommand = ""; // assign the variable command to the user entry
+// var nodeArgs = process.argv; // the array of user entry including the userCommand
 // create an empty string for holding the name of the song and name of movie
 var search = "";
 
   // Capture all the words in the address (again ignoring the first two Node arguments)
-  for (var i = 3; i < nodeArgs.length; i++) {
+  // for (var i = 3; i < nodeArgs.length; i++) {
   // Build a string with the song entry.
-    search = (search + " " + nodeArgs[i]);
-  } // end of for loop to loop through process.argv
+    // search = (search + " " + nodeArgs[i]);
+  // } // end of for loop to loop through process.argv
 
   // the above loop returns a white space before the string so we need to get rid of that.
   // search = search.trim();
-  search = search.trim();
-
+// inquirer prompt to get the user's commands
+inquirer
+  .prompt ([
+    {
+      type: "list",
+      message: "Which command would you like?",
+      choices: ["my-tweets", "spotify-this-song", "movie-this", "do-what-it-says"],
+      name: "userCommand"
+    },
+    {
+      type: "input",
+      message: "If song or movie category, what song or movie do you want to search for?, else leave blank.",
+      name: "search",
+    },
+  ]).then(function(inquirerResponse){
+    userCommand = inquirerResponse.userCommand;
+    search = inquirerResponse.search;
+    readCommand(userCommand, search);
+  });
 // create a function that will read the user entry and see if it's one of the following: `my-tweets`,`spotify-this-song`,`movie-this`, or`do-what-it-says`
-var readCommand = function(userCommand, search){
-
+var readCommand = function (userCommand, search) {
+console.log(search);
   switch (userCommand) {
     case 'my-tweets': // if the user's command is 'my-tweet' then
-        getTweets(); // call the getTweets function
+      getTweets(); // call the getTweets function
       break;
     case 'spotify-this-song': // if the commasnd is this then
-        getSpotify(); // call the getSpotify function
+      getSpotify(search); // call the getSpotify function
       break;
     case 'movie-this': // if the user command is this
-        getMovie(search); // call the getMovie function
+      getMovie(search) // call the getMovie function
       break;
     case 'do-what-it-says': // if the user command is this
-        getRandom(); // call the get random function to take the text inside of random.txt and then use it to call one of LIRI's commands.
+      getRandom() // call the get random function to take the text inside of random.txt and then use it to call one of LIRI's commands.
       break;
   } // end of switch/case
 } // end of the readCommand function
@@ -58,6 +76,7 @@ var getTweets = function(){
           // log the tweet and when it was created
           console.log((i+1) + ". You said: " + tweets[i].text + " on " + tweets[i].created_at);
           console.log(""); // adds a blank line between tweets to make it more legible
+
         } // end of for loop
       } // end of if statement
     }); // end of twitter params
@@ -144,14 +163,13 @@ var getSpotify = function(){
 var getMovie = function(search){
 
   // If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-  if (!process.argv[3]){
+  if (search == ""){
     search = "Mr. Nobody";
   }
   // run a request to the OMDB API with the movie specified
   var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=trilogy";
 
-  console.log(queryUrl); // to debug the url
-
+  console.log("my query: " + queryUrl); // to debug the url
   // tequest the movie info based on the queryURL
   request(queryUrl, function(error, response, body) {
 
